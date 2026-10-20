@@ -2,7 +2,7 @@
 
 Status: **Draft v1.0** · Owner: MySpecial · Last updated: 2026-10-20
 
-> This is the public theme format. A theme that follows it passes the same checks the MySpecial platform runs on every upload.
+> This is the public theme format. A theme that follows it passes the same checks the MySpecial platform runs on every upload (`node tools/myspecial-theme.mjs validate`).
 Security & processing: the platform security spec · E2E validation: the platform validation pipeline
 
 A **theme bundle is a single HTML file containing only a `<body>` element**: the design of the **gift-picking page**, with **slots** where the page engine puts the real gifts, names and message. It contains **no JavaScript** and **no references to anything outside itself**. Fonts, images and music are embedded in the file.
@@ -364,14 +364,14 @@ Custom themes are private to their owner in v1. Deleting one keeps any version s
 | `garden` | Lora 600 | `#EEF3EA` / `#2F6B45` | ambient `petals` |
 | `letter` | Dancing Script 600 | `#FBF3E6` / `#A3412A` | intro `envelope` |
 
-Each lives in the public templates repo at `official/<id>/theme.html` with its fonts embedded (all SIL OFL; licenses in `official/<id>/licenses/`). Each must pass the full pipeline in CI. Community themes follow the same layout under `community/<github-user>/<id>/` (README.md).
+Each lives in the public templates repo at `official/<id>/theme.html` with its fonts embedded (all SIL OFL; licenses in `official/<id>/licenses/`). Each must pass the full pipeline in CI. Community themes follow the same layout under `community/<github-user>/<id>/` (the README).
 
 ---
 
 ## 15. Open questions
 
 1. Sharing / marketplace for themes?
-2. A theme dev kit (`npx @myspecial/theme validate theme.html`, with live preview), and when?
+2. ~~Dev kit~~ — **Decided:** the open-source `myspecial-theme` CLI (`validate`, `preview`), shipped as one file in the templates repo.
 3. Are custom uploads free or premium?
 
 ---
