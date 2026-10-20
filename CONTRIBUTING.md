@@ -34,10 +34,12 @@ cp -r official/blush community/<your-github-login>/<theme-id>
 ## 3. Build and check
 
 ```bash
-node tools/build.mjs            # src/body.html → theme.html
-node tools/build.mjs --check    # what CI runs
-open community/<you>/<theme-id>/theme.html   # preview with sample content
+node tools/build.mjs                                                  # src/body.html → theme.html
+node tools/myspecial-theme.mjs validate community/<you>/<theme-id>/theme.html
+node tools/myspecial-theme.mjs preview  community/<you>/<theme-id>/theme.html --locale vi
 ```
+
+`validate` shows every problem with its line and column. `preview` serves a real gift page built from your theme (try `--gifts 20` and `--limit 3`), so you can click through picking a gift on your phone or desktop.
 
 ## 4. Open a pull request
 

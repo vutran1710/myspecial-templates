@@ -30,7 +30,9 @@ jobs:
           AUTHOR: ${{ github.event.pull_request.user.login }}
         run: node tools/check-paths.mjs "$BASE_SHA" "$AUTHOR"
 
-      # Validator + end-to-end tests: the same checks the platform runs on every upload.
-      # Enabled once the @myspecial/theme dev kit is published to npm.
-      # - name: Validate and test changed themes
-      #   run: npx --yes @myspecial/theme@1 validate --e2e $(git diff --name-only origin/main...HEAD -- '*/theme.html')
+      # The same validator the MySpecial platform runs on every upload.
+      # (After merge, the platform also runs its end-to-end browser tests.)
+      - name: Validate all themes
+        run: |
+          files=$(git ls-files '*/theme.html')
+          node tools/myspecial-theme.mjs validate $files
