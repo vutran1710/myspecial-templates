@@ -1,0 +1,100 @@
+<body data-ms-spec="1.0" data-ms-id="blush" data-ms-name="Blush" data-ms-version="1.0.0" data-ms-author="MySpecial" data-ms-description="Soft pinks and an italic serif. The classic." data-ms-effects="intro=unwrap; pick=confetti">
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 400; font-style: normal; font-display: swap; src: url({{font:inter-400.woff2}}) format("woff2"); }
+    @font-face { font-family: "Inter"; font-weight: 600; font-style: normal; font-display: swap; src: url({{font:inter-600.woff2}}) format("woff2"); }
+    @font-face { font-family: "Playfair Display"; font-weight: 600; font-style: italic; font-display: swap; src: url({{font:playfair-display-600-italic.woff2}}) format("woff2"); }
+
+    body {
+      --ms-color-bg: #FFF1F4;
+      --ms-color-surface: #FFFFFF;
+      --ms-color-ink: #3A1027;
+      --ms-color-muted: #6E3A52;
+      --ms-color-line: #F3D3DE;
+      --ms-color-soft: #F7C6D9;
+      --ms-color-accent: #C2255C;
+      --ms-color-on-accent: #FFFFFF;
+      --ms-font-display: "Playfair Display", serif;
+      --ms-font-display-style: italic;
+      --ms-font-body: "Inter", sans-serif;
+      --ms-radius-card: 20px;
+      margin: 0;
+      background: var(--ms-color-bg);
+      color: var(--ms-color-ink);
+      font-family: "Inter", sans-serif;
+    }
+
+    .page { max-width: 1040px; margin: 0 auto; padding: 32px 20px 24px; display: flex; flex-direction: column; gap: 24px; }
+
+    .intro { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; }
+    .cover { flex: 1 1 280px; margin: 0; }
+    .cover img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 24px; background: var(--ms-color-soft); }
+    .intro-text { flex: 999 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+
+    .eyebrow { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ms-color-muted); }
+    h1 { margin: 0; font-family: "Playfair Display", serif; font-style: italic; font-weight: 600; font-size: clamp(34px, 8vw, 52px); line-height: 1.12; overflow-wrap: anywhere; }
+    .message p { margin: 0 0 8px; font-size: 17px; line-height: 1.6; }
+
+    .list-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+    h2 { margin: 0; font-family: "Playfair Display", serif; font-style: italic; font-weight: 600; font-size: 26px; line-height: 1.2; }
+    .hint { margin: 0; font-size: 13px; font-weight: 500; color: var(--ms-color-muted); }
+
+    .gifts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(156px, 1fr)); gap: 12px; }
+    .gift { position: relative; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; background: var(--ms-color-surface); border: 2px solid var(--ms-color-line); border-radius: var(--ms-radius-card); transition: border-color .15s, box-shadow .15s, transform .15s; }
+    .gift img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; background: var(--ms-color-soft); }
+    .gift-text { display: flex; flex-direction: column; gap: 4px; padding: 12px 12px 14px; }
+    .gift h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+    .gift p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ms-color-muted); overflow-wrap: anywhere; }
+
+    .gift[aria-checked="true"] { border-color: var(--ms-color-accent); box-shadow: 0 10px 24px -14px var(--ms-color-accent); }
+    .gift[aria-checked="true"]::after { content: ""; position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 999px; background: var(--ms-color-accent); }
+    .gift[aria-checked="true"]::before { content: ""; position: absolute; z-index: 1; top: 18px; right: 21px; width: 10px; height: 16px; border: solid var(--ms-color-on-accent); border-width: 0 3px 3px 0; transform: rotate(45deg); }
+    .gift[aria-disabled="true"] { opacity: .55; }
+    .gift:focus-visible { outline: 3px solid var(--ms-color-ink); outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) { .gift { transition: none; } }
+  </style>
+
+  <div class="page">
+    <section class="intro">
+      <figure class="cover" data-ms-if="cover">
+        <img data-ms-slot="cover" src="{{img:cover.svg}}" alt="">
+      </figure>
+      <div class="intro-text">
+        <p class="eyebrow" data-ms-slot="dedication">For Linh, from Vu</p>
+        <h1 data-ms-slot="title">Happy anniversary, my love</h1>
+        <div class="message" data-ms-slot="message">
+          <p>Three years and you still surprise me every day.</p>
+          <p>This time it's your turn to choose — pick the one that makes you smile.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="list-head">
+      <h2 data-ms-text="pick-heading">Pick the one you want most</h2>
+      <p class="hint" data-ms-text="pick-hint">No prices here — just choose with your heart</p>
+    </div>
+
+    <ul class="gifts" data-ms-gift-list>
+      <li class="gift" data-ms-gift>
+        <img data-ms-slot="gift-image" src="{{img:gift-1.svg}}" alt="">
+        <div class="gift-text">
+          <h3 data-ms-slot="gift-name">Pottery class for two</h3>
+          <p data-ms-slot="gift-note" data-ms-if="gift-note">You keep sending me those videos.</p>
+        </div>
+      </li>
+      <li class="gift" data-ms-gift>
+        <img data-ms-slot="gift-image" src="{{img:gift-2.svg}}" alt="">
+        <div class="gift-text">
+          <h3 data-ms-slot="gift-name">Silk pajama set</h3>
+          <p data-ms-slot="gift-note">For our lazy Sundays.</p>
+        </div>
+      </li>
+      <li class="gift" data-ms-gift>
+        <img data-ms-slot="gift-image" src="{{img:gift-3.svg}}" alt="">
+        <div class="gift-text">
+          <h3 data-ms-slot="gift-name">Birthstone necklace</h3>
+          <p data-ms-slot="gift-note">Something to keep.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</body>

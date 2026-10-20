@@ -1,0 +1,36 @@
+name: Validate themes
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Built theme files are up to date
+        run: node tools/build.mjs --check
+
+      - name: Contribution rules
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: node tools/check-paths.mjs "$BASE_SHA" "$AUTHOR"
+
+      # Validator + end-to-end tests: the same checks the platform runs on every upload.
+      # Enabled once the @myspecial/theme dev kit is published to npm.
+      # - name: Validate and test changed themes
+      #   run: npx --yes @myspecial/theme@1 validate --e2e $(git diff --name-only origin/main...HEAD -- '*/theme.html')
