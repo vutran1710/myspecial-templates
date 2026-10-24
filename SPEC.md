@@ -246,6 +246,7 @@ Parsed with a real CSS parser and rewritten:
 - **Inline styles** are moved into the stylesheet as hashed classes, so the published page has no inline styles.
 - **Allowed:** selectors, `@media`, `@supports`, `@keyframes`, `@font-face` (embedded `src` only), custom properties, animations, transitions.
 - **Reserved names:** class, id and `@keyframes` names starting with `ms-` belong to the page engine and the MySpecial Paper kit. A theme using one is rejected (`css.reserved_name` in CSS, `html.reserved_name` in markup).
+- **Plain names:** a `@keyframes` name is a plain identifier, without escapes or quotes (`css.keyframes_name`). A selector cannot start with a combinator (`~ *`, `> p`).
 - **Rejected:** `@import`, `@namespace`, `@charset`; `url()` other than an embedded `data:` URI of an allowed type; `local()`; `expression()`, `behavior`, `-moz-binding`; `position: fixed`; `content:` longer than 40 characters.
 - **Limits:** ≤ 200 KB of CSS excluding embedded data; ≤ 2 000 rules; nesting ≤ 10; ≤ 6 compound parts per selector.
 
@@ -445,6 +446,8 @@ Each lives in the public templates repo at `official/<id>/theme.html` with its f
 | `struct.required_slot_missing` | §6.2 (`title`, `dedication`) |
 | `css.*` | §7 (`css.reserved_name`: an `ms-` class, id or `@keyframes` name) |
 | `html.reserved_name` | §7, §11 (an `ms-` class or id in the markup) |
+| `css.keyframes_name` | §7 (an escaped or quoted `@keyframes` name) |
+| `internal.unexpected` | The file could not be checked (never a crash: the upload is rejected and can be tried again) |
 | `asset.*` (type, size, dimensions, magic mismatch, glyph coverage, license) | §10 |
 | `token.contrast` | §5 |
 | `text.untranslated` (warning) | §6.5 |

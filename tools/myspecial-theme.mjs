@@ -31766,9 +31766,16 @@ function processStylesheet(cssText, base, ctx) {
         return;
       }
       const isKeyframes = name.endsWith("keyframes");
-      if (isKeyframes && RESERVED_NAME.test(cssName(node.params))) {
-        report.error("css.reserved_name", `@keyframes "${node.params.trim()}": names starting with ms- are reserved for the page engine`, at(node));
-        return;
+      if (isKeyframes) {
+        const kname = node.params.trim();
+        if (/[\\'"]/.test(kname)) {
+          report.error("css.keyframes_name", `@keyframes "${kname}": write the name plainly, without escapes or quotes`, at(node));
+          return;
+        }
+        if (RESERVED_NAME.test(kname)) {
+          report.error("css.reserved_name", `@keyframes "${kname}": names starting with ms- are reserved for the page engine`, at(node));
+          return;
+        }
       }
       node.each((child) => visit(child, depth + 1, isKeyframes));
       return;
@@ -31937,6 +31944,7 @@ function scopeSelector(selector, report, offset) {
           failed = true;
         }
         const top = sel.nodes;
+        if (top[0]?.type === "combinator" && (top[0].value ?? "").trim() !== "") return refuse(sel, "a selector cannot start with a combinator");
         const bodyIndex = top.findIndex((n) => n.type === "tag" && n.value.toLowerCase() === "body");
         const firstCombinator = top.findIndex((n) => n.type === "combinator");
         if (bodyIndex !== -1) {
@@ -31955,10 +31963,6 @@ function scopeSelector(selector, report, offset) {
     return null;
   }
   return failed ? null : result;
-}
-function cssName(raw) {
-  const s = raw.trim().replace(/^(['"])([\s\S]*)\1$/, "$2");
-  return s.replace(/\\([0-9a-fA-F]{1,6})[ \t\n]?|\\([\s\S])/g, (_, hex, ch) => hex ? String.fromCodePoint(parseInt(hex, 16)) : ch);
 }
 function checkDecl(d, ctx, urlKind, offset) {
   const { report } = ctx;
@@ -40463,6 +40467,17 @@ function pairs(v) {
 
 // ../theme-validator/src/index.ts
 function validateTheme(input) {
+  try {
+    return validate(input);
+  } catch {
+    return {
+      ok: false,
+      errors: [{ code: "internal.unexpected", message: "This file could not be checked. Please try again, or simplify it and upload it again.", severity: "error" }],
+      warnings: []
+    };
+  }
+}
+function validate(input) {
   const bytes = typeof input === "string" ? Buffer.from(input, "utf8") : Buffer.from(input);
   const early = new Reporter(new SourceMap(""));
   if (bytes.length > LIMITS.fileBytes) {
@@ -40707,6 +40722,12 @@ body.ms-js:not([data-ms-screen="picked"]) [data-ms-engine="picked"] { display: n
 /* The pick bar comes before the footer in the page (keyboard order: the gifts, then "This one, please", then the
    footer) but is drawn last: it rides the foot of the screen (sticky) and ends below the footer, as Pick draws it. */
 body.ms-her > [data-ms-engine="pick-bar"] { order: 1; }
+
+/* The controls she must always be able to read and press are set in the house face, never the theme's (a theme font
+   with blank glyphs passes the glyph check): the Report link, the pick bar's button, the confirm sheet's buttons. */
+[data-ms-engine="footer"] a, [data-ms-engine="pick-bar"] [data-ms-action], [data-ms-engine="confirm"] [data-ms-action] {
+  font-family: "MS Be Vietnam Pro", system-ui, sans-serif;
+}
 
 /* The theme lives inside this frame; it cannot paint outside it. Its text starts from the theme's own tokens. */
 [data-ms-engine="frame"] { flex: 1 0 auto; position: relative; isolation: isolate; contain: paint; font-family: var(--ms-font-body); font-size: 16px; line-height: normal; color: var(--ms-color-ink); }
@@ -42107,7 +42128,7 @@ function printResult(path, r) {
   for (const e of r.errors) console.log(`  ${red("error")}  ${path}:${e.line ?? "?"}:${e.column ?? "?"}  ${dim(e.code)}  ${e.message}`);
   for (const w of r.warnings) console.log(`  ${yellow("warn")}   ${path}:${w.line ?? "?"}:${w.column ?? "?"}  ${dim(w.code)}  ${w.message}`);
 }
-function validate(files, json) {
+function validate2(files, json) {
   if (!files.length) {
     console.error("validate: give at least one theme.html");
     return 2;
@@ -42255,7 +42276,7 @@ function main() {
     console.log(VERSION);
     return 0;
   }
-  if (cmd === "validate") return validate(files, !!opts.json);
+  if (cmd === "validate") return validate2(files, !!opts.json);
   if (cmd === "preview") {
     if (files.length !== 1) {
       console.error("preview: give exactly one theme.html");
