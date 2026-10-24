@@ -1,6 +1,6 @@
 # Theme Bundle Spec — v1.0 (draft)
 
-Status: **Draft v1.0** · Owner: MySpecial · Last updated: 2026-10-20
+Status: **Draft v1.0** · Owner: MySpecial · Last updated: 2026-10-25
 
 > This is the public theme format. A theme that follows it passes the same checks the MySpecial platform runs on every upload (`node tools/myspecial-theme.mjs validate`).
 Security & processing: the platform security spec · E2E validation: the platform validation pipeline
@@ -134,8 +134,11 @@ Declared as CSS custom properties with literal values in a `body { … }` rule o
 | `--ms-font-body` | font stack (embedded families only) | engine default (Inter) |
 | `--ms-radius-card` | length | `20px` |
 | `--ms-radius-button` | length | `999px` |
+| `--ms-ground` | `plain \| paper \| wrap` | none (= `plain`) |
 
 Token values must be literal (no `var()` chains, no `url()`).
+
+`--ms-ground` is optional and has no default. It picks what the engine draws behind **every** screen of her page: `plain` the `--ms-color-bg` colour, `paper` the house rice paper, `wrap` the house wrapping paper with blossoms. A theme that uses `paper` or `wrap` leaves its own root transparent so the ground shows through. Rice paper uses `wrap`.
 
 **Required contrast** (an upload is rejected if any check fails): `ink` and `muted` on `bg` and `surface` ≥ 4.5:1; `on-accent` on `accent` ≥ 4.5:1; `accent` on `bg` ≥ 3:1.
 
@@ -209,15 +212,17 @@ Literal text in the theme is shown **as-is in every language**. For UI copy, use
 
 | Key | en | vi |
 |---|---|---|
-| `pick-heading` | Pick the one you want most | Chọn món em thích nhất |
-| `pick-hint` | No prices here — just choose with your heart | Không có giá đâu — cứ chọn theo trái tim nhé |
-| `pick-limit` | You can pick {n} | Em được chọn {n} món |
+| `pick-heading` | Choose the one you want most | Chọn món em thích nhất |
+| `pick-hint` | No prices here. Choose with your heart. | Không có giá ở đây. Hãy chọn bằng trái tim. |
+| `pick-limit` | You can choose {n} | Em được chọn {n} món |
 
 ```html
-<h2 data-ms-text="pick-heading" data-ms-text-vi="Em thích món nào nhất?">Pick the one you want most</h2>
+<h2 data-ms-text="pick-heading" data-ms-text-vi="Em thích món nào nhất?">Choose the one you want most</h2>
 ```
 
-`data-ms-text-en` / `data-ms-text-vi` (≤ 120 chars) override the engine string per locale. The validator **warns** about literal text longer than 20 characters outside slots and `data-ms-text`, since it won't be translated.
+`data-ms-text-en` / `data-ms-text-vi` (≤ 120 chars) override the engine string per locale.
+
+In secret and shuffle modes the engine draws the gift game itself (§9): the gift list and every `data-ms-text` element are removed from the theme; the game section has its own headings. The validator **warns** about literal text longer than 20 characters outside slots and `data-ms-text`, since it won't be translated.
 
 ### 6.6 Selection styling
 
@@ -240,6 +245,7 @@ Parsed with a real CSS parser and rewritten:
 - **Layering:** output goes into `@layer theme`. Engine UI is outside the theme root and unlayered, so it can't be targeted or overridden.
 - **Inline styles** are moved into the stylesheet as hashed classes, so the published page has no inline styles.
 - **Allowed:** selectors, `@media`, `@supports`, `@keyframes`, `@font-face` (embedded `src` only), custom properties, animations, transitions.
+- **Reserved names:** class, id and `@keyframes` names starting with `ms-` belong to the page engine and the MySpecial Paper kit. A theme using one is rejected (`css.reserved_name` in CSS, `html.reserved_name` in markup).
 - **Rejected:** `@import`, `@namespace`, `@charset`; `url()` other than an embedded `data:` URI of an allowed type; `local()`; `expression()`, `behavior`, `-moz-binding`; `position: fixed`; `content:` longer than 40 characters.
 - **Limits:** ≤ 200 KB of CSS excluding embedded data; ≤ 2 000 rules; nesting ≤ 10; ≤ 6 compound parts per selector.
 
@@ -269,7 +275,7 @@ Parsed with a real CSS parser and rewritten:
 
 ## 9. Engine screens
 
-The theme defines **only the pick page**. The engine owns and renders the rest, using the theme's tokens (§5) and embedded fonts:
+The theme defines **only the pick page**. The engine owns and renders the rest, drawn with the MySpecial Paper kit in the theme's tokens (§5) and embedded fonts; `--ms-ground` picks the ground behind every screen:
 
 | Screen / UI | Notes |
 |---|---|
@@ -279,6 +285,8 @@ The theme defines **only the pick page**. The engine owns and renders the rest, 
 | Confirm sheet | "You can't change it after" (picks are final) |
 | Picked | Shows the confirmed gift(s); shown on every later visit |
 | Footer | "A page from @vu · Made with MySpecial" + "Report this page" |
+| Game (secret / shuffle) | Engine-drawn after the theme frame: the sealed envelope (secret), the table of boxes (shuffle). Replaces the gift list and the theme's pick texts |
+| Closed | "Return to sender" (410) once the day is over or the page was cancelled. No theme: the house paper |
 
 Themes can't style these beyond tokens and can't cover them (enforced by the tests in the validation pipeline).
 
@@ -359,6 +367,7 @@ Custom themes are private to their owner in v1. Deleting one keeps any version s
 
 | id | Display font | Ground / accent | Effects |
 |---|---|---|---|
+| `rice-paper` | Newsreader italic | `#EFE6D6` / `#B3392F`, `--ms-ground: wrap` | (none) — the default for new pages |
 | `blush` | Playfair Display italic | `#FFF1F4` / `#C2255C` | intro `unwrap`, pick `confetti` |
 | `midnight` | Bricolage Grotesque | `#15112A` / `#F4B6CF` | ambient `stars`, pick `glow` |
 | `garden` | Lora 600 | `#EEF3EA` / `#2F6B45` | ambient `petals` |
@@ -403,7 +412,7 @@ Each lives in the public templates repo at `official/<id>/theme.html` with its f
     <p data-ms-slot="dedication">For Linh, from Vu</p>
     <h1 data-ms-slot="title">Happy anniversary, my love</h1>
     <div data-ms-slot="message"><p>Pick the one that makes you smile.</p></div>
-    <h2 data-ms-text="pick-heading">Pick the one you want most</h2>
+    <h2 data-ms-text="pick-heading">Choose the one you want most</h2>
     <ul class="gifts" data-ms-gift-list>
       <li class="gift" data-ms-gift>
         <img data-ms-slot="gift-image" alt="" src="data:image/webp;base64,…">
@@ -434,7 +443,8 @@ Each lives in the public templates repo at `official/<id>/theme.html` with its f
 | `struct.unknown_slot` / `struct.unknown_data_attr` | R8 |
 | `struct.slot_wrong_element` | R9 |
 | `struct.required_slot_missing` | §6.2 (`title`, `dedication`) |
-| `css.*` | §7 |
+| `css.*` | §7 (`css.reserved_name`: an `ms-` class, id or `@keyframes` name) |
+| `html.reserved_name` | §7, §11 (an `ms-` class or id in the markup) |
 | `asset.*` (type, size, dimensions, magic mismatch, glyph coverage, license) | §10 |
 | `token.contrast` | §5 |
 | `text.untranslated` (warning) | §6.5 |
