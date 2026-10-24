@@ -111,12 +111,11 @@
       .gifts { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 36px 24px; }
     }
     @media (min-width: 1000px) {
-      .page { display: grid; grid-template-columns: minmax(0, 454px) minmax(0, 1fr); column-gap: 96px; align-items: start; max-width: 1580px; margin: 0 auto; padding: 0 40px; }
-      .card { grid-row: 1 / span 3; margin: 82px 0 0; }
+      .page { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); column-gap: 64px; align-items: start; max-width: 1120px; margin: 0 auto; padding: 0 40px; }
+      .card { grid-row: 1 / span 3; margin: 54px 0 0; }
       .ribbon { display: none; }
-      .intro { margin: 72px 0 0; text-align: left; }
-      .gifts { margin: 70px 0 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 30px 30px; }
-      .gifts > :nth-child(even) { margin-top: 26px; }
+      .intro { gap: 4px; margin: 56px 0 0; text-align: left; }
+      .gifts { grid-template-columns: repeat(4, minmax(0, 150px)); gap: 30px 20px; margin: 46px 0 0; }
     }
   </style>
 
