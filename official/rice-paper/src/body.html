@@ -1,0 +1,191 @@
+<body data-ms-spec="1.0" data-ms-id="rice-paper" data-ms-name="Rice paper" data-ms-version="1.0.0" data-ms-author="MySpecial" data-ms-description="Gift tags on a red thread, a taped note, wrapping paper with blossoms. The house paper.">
+  <style>
+    @font-face { font-family: "Newsreader"; font-weight: 400; font-style: normal; font-display: swap; src: url({{font:newsreader-400.woff2}}) format("woff2"); }
+    @font-face { font-family: "Newsreader"; font-weight: 400; font-style: italic; font-display: swap; src: url({{font:newsreader-400-italic.woff2}}) format("woff2"); }
+    @font-face { font-family: "Be Vietnam Pro"; font-weight: 400; font-style: normal; font-display: swap; src: url({{font:be-vietnam-pro-400.woff2}}) format("woff2"); }
+    @font-face { font-family: "Be Vietnam Pro"; font-weight: 500; font-style: normal; font-display: swap; src: url({{font:be-vietnam-pro-500.woff2}}) format("woff2"); }
+    @font-face { font-family: "Be Vietnam Pro"; font-weight: 600; font-style: normal; font-display: swap; src: url({{font:be-vietnam-pro-600.woff2}}) format("woff2"); }
+
+    /* The house paper: the Paper kit's colours and type. --ms-ground: wrap asks the engine for the wrapping paper
+       with blossoms behind every screen, so this page paints no ground of its own. */
+    body {
+      --ms-color-bg: #EFE6D6;
+      --ms-color-surface: #F8F3EA;
+      --ms-color-ink: #2B2620;
+      --ms-color-muted: #6E655A;
+      --ms-color-line: #D9CCB7;
+      --ms-color-soft: #EBC3BB;
+      --ms-color-accent: #B3392F;
+      --ms-color-on-accent: #FBF6EE;
+      --ms-font-display: "Newsreader", serif;
+      --ms-font-display-style: italic;
+      --ms-font-body: "Be Vietnam Pro", sans-serif;
+      --ms-radius-card: 0px;
+      --ms-radius-button: 0px;
+      --ms-ground: wrap;
+      --rp-edge: #BFB09A;
+      --rp-deep: #8F2C23;
+      --rp-laid: url({{img:paper-laid.webp}});
+      margin: 0;
+      padding: 0 0 56px;
+      color: var(--ms-color-ink);
+      font-family: "Be Vietnam Pro", sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+    /* Opened on its own (a designer's preview): the published theme root never carries data-ms-spec. */
+    body[data-ms-spec] { background-color: var(--ms-color-bg); }
+
+    .card {
+      position: relative; isolation: isolate; display: flex; flex-direction: column; gap: 14px;
+      margin: 40px 28px 0; padding: 34px 24px 26px;
+      background-color: var(--ms-color-surface); background-image: var(--rp-laid); background-size: 128px 128px;
+      box-shadow: inset 0 0 0 1px var(--ms-color-line);
+      transform: rotate(-0.8deg);
+    }
+    .tape {
+      position: absolute; top: -9px; left: 50%; margin-left: -32px; width: 64px; height: 18px;
+      background: var(--ms-color-line); transform: rotate(2deg);
+      clip-path: polygon(0 0, 100% 0, 96% 25%, 100% 50%, 96% 75%, 100% 100%, 0 100%, 4% 75%, 0 50%, 4% 25%);
+    }
+    .eyebrow { margin: 0; font-size: 11.5px; font-weight: 500; letter-spacing: 0.12em; line-height: 1.55; text-transform: uppercase; color: var(--ms-color-muted); }
+    h1 { margin: 0; font-family: "Newsreader", serif; font-style: italic; font-weight: 400; font-size: 38px; line-height: 1.05; }
+    .message { display: flex; flex-direction: column; gap: 8px; }
+    .message p { margin: 0; font-family: "Newsreader", serif; font-size: 19px; line-height: 1.5; }
+    .sign { align-self: flex-end; margin: 0; font-family: "Newsreader", serif; font-style: italic; font-size: 19px; line-height: 1.55; color: var(--ms-color-accent); }
+
+    .ribbon { display: flex; align-items: center; margin: 56px 28px 0; }
+    .ribbon .line { flex: 1; height: 2px; background: var(--ms-color-accent); }
+    .bow { flex: none; display: block; width: 40px; height: 26px; }
+    .bow .loop { fill: var(--ms-color-accent); }
+    .bow .tails { fill: none; stroke: var(--ms-color-accent); stroke-width: 2.4; }
+    .bow .knot { fill: var(--rp-deep); }
+
+    .intro { display: flex; flex-direction: column; gap: 6px; margin: 40px 28px 0; text-align: center; }
+    h2 { margin: 0; font-family: "Newsreader", serif; font-style: italic; font-weight: 400; font-size: 30px; line-height: 1.15; }
+    .hint { margin: 0; font-size: 14px; line-height: 1.55; color: var(--ms-color-muted); }
+
+    /* Gift tags hung from a red thread, two columns, every second one stepped down. */
+    .gifts { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 30px 22px; margin: 34px 28px 0; padding: 0; }
+    .gifts > :nth-child(even) { margin-top: 18px; }
+    .tag { position: relative; display: block; margin: 0; padding: 22px 0 0; transform: rotate(var(--rp-tilt, 0deg)); transform-origin: 50% 0; cursor: pointer; }
+    .tag:nth-child(4n+1) { --rp-tilt: -2deg; }
+    .tag:nth-child(4n+2) { --rp-tilt: 1.5deg; }
+    .tag:nth-child(4n+3) { --rp-tilt: 1deg; }
+    .tag:nth-child(4n) { --rp-tilt: -1.5deg; }
+    .thread { position: absolute; top: 0; left: 50%; margin-left: -9px; width: 40px; height: 40px; pointer-events: none; }
+    .thread path { fill: none; stroke: var(--ms-color-accent); stroke-width: 1.5; }
+    .tag:nth-child(odd) .thread-b, .tag:nth-child(even) .thread-a { display: none; }
+    .edge { position: relative; isolation: isolate; display: block; padding: 1px; }
+    .face { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: 7px; padding: 30px 12px 10px; }
+    .edge::after, .face::after {
+      content: ""; position: absolute; inset: 0; z-index: -1;
+      clip-path: polygon(24px 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%, 0 24px);
+    }
+    .edge::after { background: var(--rp-edge); }
+    .face::after { background-color: var(--ms-color-surface); background-image: var(--rp-laid); background-size: 128px 128px; }
+    .hole { position: absolute; top: 10px; left: 50%; margin-left: -6px; width: 12px; height: 12px; border-radius: 50%; background: var(--ms-color-bg); box-shadow: inset 0 0 0 1px var(--rp-edge); }
+    .photo { display: block; width: 100%; height: 96px; object-fit: cover; }
+    .name { margin: 0; font-family: "Newsreader", serif; font-style: italic; font-weight: 400; font-size: 19px; line-height: 1.2; }
+    .note { margin: 0; font-size: 12px; line-height: 1.4; color: var(--ms-color-muted); }
+
+    /* Chosen: the red outline and the round CHOSEN stamp beside the photo. */
+    .tag[aria-checked="true"] .edge { padding: 2px; }
+    .tag[aria-checked="true"] .edge::after { background: var(--ms-color-accent); }
+    .tag[aria-checked="true"] .face::before {
+      content: "Chosen"; position: absolute; top: 28px; right: 6px; z-index: 1;
+      display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 2px solid var(--ms-color-accent); border-radius: 50%;
+      background: rgba(248, 243, 234, 0.8); color: var(--ms-color-accent);
+      font-size: 7.5px; font-weight: 600; letter-spacing: 0.02em; line-height: 1; white-space: nowrap; text-transform: uppercase;
+      transform: rotate(-14deg);
+    }
+    .tag[aria-checked="true"] .face:lang(vi)::before { content: "Đã chọn"; }
+    .tag[aria-disabled="true"] { opacity: 0.45; }
+    .tag:hover, .tag:focus-visible { animation: rp-sway 1.4s ease-in-out; }
+    @keyframes rp-sway { 0%, 100% { rotate: 0deg; } 25% { rotate: 4deg; } 50% { rotate: -3deg; } 75% { rotate: 1.5deg; } }
+    @media (prefers-reduced-motion: reduce) { .tag:hover, .tag:focus-visible { animation: none; } }
+
+    /* Wide screens (PickDesktop): the note on the left, the gifts in one row on the right. */
+    @media (min-width: 720px) {
+      .gifts { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 36px 24px; }
+    }
+    @media (min-width: 1000px) {
+      .page { box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); column-gap: 64px; align-items: start; max-width: 1120px; margin: 0 auto; padding: 0 40px; }
+      .card { grid-row: 1 / span 3; margin: 54px 0 0; }
+      .ribbon { display: none; }
+      .intro { gap: 4px; margin: 56px 0 0; text-align: left; }
+      .gifts { grid-template-columns: repeat(4, minmax(0, 150px)); gap: 30px 20px; margin: 46px 0 0; }
+    }
+  </style>
+
+  <div class="page">
+    <article class="card">
+      <span class="tape"></span>
+      <p class="eyebrow" data-ms-slot="dedication">For Linh, from Vu Tran</p>
+      <h1 data-ms-slot="title">Happy anniversary, Linh</h1>
+      <div class="message" data-ms-slot="message">
+        <p>Three years and you still surprise me every day. This time it is your turn to choose.</p>
+      </div>
+      <p class="sign" data-ms-if="message">— <span data-ms-slot="giver-name">Vu</span></p>
+    </article>
+
+    <div class="ribbon">
+      <span class="line"></span>
+      <svg class="bow" viewBox="0 0 44 28" role="presentation">
+        <path class="loop" d="M22 12C14 1 3 3 5 11c2 8 11 7 17 1z"/>
+        <path class="loop" d="M22 12c8-11 19-9 17-1-2 8-11 7-17 1z"/>
+        <path class="tails" d="M22 12l-7 14M22 12l7 14"/>
+        <circle class="knot" cx="22" cy="12" r="3.4"/>
+      </svg>
+      <span class="line"></span>
+    </div>
+
+    <div class="intro">
+      <h2 data-ms-text="pick-heading">Choose the one you want most</h2>
+      <p class="hint" data-ms-text="pick-hint">No prices here. Choose with your heart.</p>
+    </div>
+
+    <ul class="gifts" data-ms-gift-list>
+      <li class="tag" data-ms-gift>
+        <svg class="thread thread-a" viewBox="0 0 40 40" role="presentation"><path d="M9 38C9 22 24 22 22 2"/></svg>
+        <svg class="thread thread-b" viewBox="0 0 40 40" role="presentation"><path d="M9 38C9 24 2 18 12 2"/></svg>
+        <div class="edge">
+          <div class="face">
+            <span class="hole"></span>
+            <img class="photo" data-ms-slot="gift-image" src="{{img:gift-p.svg}}" alt="">
+            <h3 class="name" data-ms-slot="gift-name">Pottery class for two</h3>
+            <p class="note" data-ms-slot="gift-note" data-ms-if="gift-note">You keep sending me those videos.</p>
+          </div>
+        </div>
+      </li>
+      <li class="tag" data-ms-gift>
+        <svg class="thread thread-a" viewBox="0 0 40 40" role="presentation"><path d="M9 38C9 22 24 22 22 2"/></svg>
+        <svg class="thread thread-b" viewBox="0 0 40 40" role="presentation"><path d="M9 38C9 24 2 18 12 2"/></svg>
+        <div class="edge"><div class="face"><span class="hole"></span>
+          <img class="photo" data-ms-slot="gift-image" src="{{img:gift-s.svg}}" alt="">
+          <h3 class="name" data-ms-slot="gift-name">Silk pajama set</h3>
+          <p class="note" data-ms-slot="gift-note">For our lazy Sundays.</p>
+        </div></div>
+      </li>
+      <li class="tag" data-ms-gift>
+        <svg class="thread thread-a" viewBox="0 0 40 40" role="presentation"><path d="M9 38C9 22 24 22 22 2"/></svg>
+        <svg class="thread thread-b" viewBox="0 0 40 40" role="presentation"><path d="M9 38C9 24 2 18 12 2"/></svg>
+        <div class="edge"><div class="face"><span class="hole"></span>
+          <img class="photo" data-ms-slot="gift-image" src="{{img:gift-w.svg}}" alt="">
+          <h3 class="name" data-ms-slot="gift-name">Weekend in Da Lat</h3>
+          <p class="note" data-ms-slot="gift-note">Just us. No phones.</p>
+        </div></div>
+      </li>
+      <li class="tag" data-ms-gift>
+        <svg class="thread thread-a" viewBox="0 0 40 40" role="presentation"><path d="M9 38C9 22 24 22 22 2"/></svg>
+        <svg class="thread thread-b" viewBox="0 0 40 40" role="presentation"><path d="M9 38C9 24 2 18 12 2"/></svg>
+        <div class="edge"><div class="face"><span class="hole"></span>
+          <img class="photo" data-ms-slot="gift-image" src="{{img:gift-b.svg}}" alt="">
+          <h3 class="name" data-ms-slot="gift-name">Birthstone necklace</h3>
+          <p class="note" data-ms-slot="gift-note">Something to keep.</p>
+        </div></div>
+      </li>
+    </ul>
+  </div>
+</body>
