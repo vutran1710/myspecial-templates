@@ -136,7 +136,7 @@ Token values must be literal (no `var()` chains, no `url()`).
 
 `--ms-ground` is optional and has no default. It picks what the engine draws behind **every** screen of her page: `plain` the `--ms-color-bg` colour, `paper` the house rice paper, `wrap` the house wrapping paper with blossoms. A theme that uses `paper` or `wrap` leaves its own root transparent so the ground shows through. Rice paper uses `wrap`.
 
-**Contrast** is noted as `token.contrast` when it falls short, never refused: `ink` and `muted` on `bg` and `surface` ≥ 4.5:1; `on-accent` on `accent` ≥ 4.5:1; `accent` on `bg` ≥ 3:1.
+**Contrast** is noted as `token.contrast` when it falls short, never refused: `ink` and `muted` on `bg` and `surface` ≥ 4.5:1; `on-accent` on `accent` ≥ 4.5:1; `accent` on `bg` ≥ 3:1. One exception comes from the browser check, not the tokens: the engine draws its own Report link in the theme's colours, and a paper whose colours leave it under 3:1 is refused (LAYOUT-04), since that link must stay readable on every page.
 
 ---
 
