@@ -156,7 +156,7 @@ A **slot** is an element marked with `data-ms-slot="<name>"`. The theme's conten
 | R6 | The gift template contains exactly one `gift-name` and one `gift-image` slot, and at most one `gift-note` slot |
 | R7 | Page slots (§6.2) appear at most once each, outside the gift list. Gift slots (§6.3) appear only inside a gift |
 | R8 | Every `data-ms-*` attribute and slot name is from this spec; unknown ones are errors |
-| R9 | The image slots (`cover`, `gift-image`) are `<img>`. Every other slot, the gift list and the gifts sit on any element that can hold content (not `img`, `br`, `hr`, `wbr`, `col`, `audio`, `svg`) |
+| R9 | The image slots (`cover`, `gift-image`) are `<img>`; the `message` slot is a flow container (it receives `<p>` lines). Every other slot, the gift list and the gifts sit on any element that can hold content (not `img`, `br`, `hr`, `wbr`, `audio`, `svg`, nor a table's structure: `table thead tbody tfoot tr colgroup col`) |
 
 ### 6.2 Page slots
 
@@ -164,7 +164,7 @@ A **slot** is an element marked with `data-ms-slot="<name>"`. The theme's conten
 |---|---|---|---|
 | `title` | ✔ | any | Occasion title (text). The engine adds `role="heading" aria-level="1"` unless it is an `h1` |
 | `dedication` | ✔ | any | Localized line, e.g. "For Linh, from Vu" / "Gửi Linh, từ Vu" |
-| `message` | | any container | Giver's message: one `<p>` per line |
+| `message` | | a flow container (`div section article aside main figure figcaption blockquote li dd td th header footer nav address`) | Giver's message: one `<p>` per line |
 | `cover` | | `img` | Giver's cover photo (`src`, `srcset`, `sizes`, `alt`, `width`, `height`) |
 | `recipient-name` | | any | Her name (text) |
 | `giver-name` | | any | Giver's display name (text) |
@@ -243,9 +243,10 @@ Parsed with a real CSS parser and rewritten:
 - **Allowed:** selectors, `@media`, `@supports`, `@keyframes`, `@font-face` (embedded `src` only), custom properties, animations, transitions.
 - **Reserved names:** class, id and `@keyframes` names starting with `ms-` belong to the page engine and the MySpecial Paper kit. A theme using one is rejected (`css.reserved_name` in CSS, `html.reserved_name` in markup).
 - **Plain names:** a `@keyframes` name is a plain identifier, without escapes or quotes (`css.keyframes_name`). A selector cannot start with a combinator (`~ *`, `> p`).
+- **Attribute selectors** may test only what the paper itself put there, the states the engine sets on a gift, and the giver's options: `class id lang dir role hidden title alt aria-checked aria-disabled aria-selected aria-expanded aria-hidden data-ms-gift data-ms-gift-list data-ms-slot data-ms-if data-ms-text data-ms-opt-*`. What the engine puts on the page for itself (`data-ms-page-id`, `data-ms-gift-id`, `data-ms-screen`, …) cannot be tested (`css.selector_not_allowed`): with images from the web allowed, a rule that tested such a value and set a background would report it to the image host.
 - **Fonts:** any `font-family` stack. Embedded families are checked (§10); a named family that is not embedded is the device's to provide, and a stack of those with no generic family at the end is noted (`font.no_fallback`).
 - **Rejected:** `@import`, `@namespace`, `@charset`; `url()` other than an embedded `data:` URI of an allowed type or an `https:` image (`http:` is `ref.insecure`); `local()`; `expression()`, `behavior`, `-moz-binding`; `position: fixed`; `content:` longer than 40 characters.
-- **Limits:** ≤ 200 KB of CSS excluding embedded data; ≤ 2 000 rules; nesting ≤ 10; ≤ 6 compound parts per selector.
+- **Limits** (over every `<style>` together): ≤ 200 KB of CSS excluding embedded data; ≤ 2 000 rules; ≤ 6 `@font-face`; nesting ≤ 10; ≤ 6 compound parts per selector.
 
 ---
 
@@ -305,7 +306,7 @@ Themes can't style these beyond tokens and can't cover them (enforced by the tes
 | Fonts | ≤ 6 faces |
 | DOM | ≤ 3 000 elements, depth ≤ 32 |
 
-- **Images from the web:** `<img src="https://…">` and CSS `url(https://…)` are kept as they are and loaded by her browser (her page's policy allows `img-src https:`). The image host then sees when, and from where, she opens the page. `http:` is refused (`ref.insecure`).
+- **Images from the web:** `<img src="https://…">` and CSS `url(https://…)` are kept as they are and loaded by her browser (her page's policy allows `img-src https:`). The image host then sees when, and from where, she opens the page, and, where a rule ties an image to a gift's state, which gift she tapped; it can also change the picture after the paper was checked. The browser check stands in a 2000×1500 picture for every web image, so an unsized one that would push a phone sideways is caught. `http:` is refused (`ref.insecure`).
 - Embedded data must be base64 and match its declared type by magic bytes.
 - At upload, every embedded asset is **extracted**, sanitized, re-encoded and stored as a separate file on the user-content domain. The published page references those files and **never contains `data:` URIs**.
 - Sample content inside slots (e.g. sample gift photos) is used only for the validator's preview, never published.
