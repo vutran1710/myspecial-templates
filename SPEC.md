@@ -46,15 +46,11 @@ Official and community themes have no extra powers. They use the same format, va
 
 1. **One file, one `<body>`.** The upload is exactly one UTF-8 `.html` file, ≤ 5 MB, containing **exactly one `<body>…</body>` element and nothing else**: no doctype, no `<html>`, no `<head>`, nothing before or after it except whitespace. No zip, no other files.
 2. **No JavaScript.** No `<script>` of any type (including JSON or modules), no `on*` attributes, no `javascript:` URLs, no `<noscript>`.
-3. **Self-contained.** Every resource is embedded as a `data:` URI of an allowed type (§10). Nothing may reference anything outside the file:
-   - no `http:`, `https:`, `blob:`, `file:` or protocol-relative / root-relative URLs
-   - no `<link>`, `<base>` or `@import`
-   - no Google Fonts or other font services, no CDNs
-   - no named font family that isn't embedded (generic `serif`, `sans-serif`, `cursive`, `monospace` and `system-ui` are allowed, as the **last** fallback only)
-4. **Static.** No forms, inputs, buttons, links, iframes or other interactive elements. All interaction is added by the engine at the slots (§6).
-5. **Structurally valid.** The required elements and slots in §6 must be present exactly as specified.
+3. **Nothing from outside but images.** Scripts, stylesheets, fonts and audio stay in the file: fonts and audio embedded as `data:` URIs of an allowed type (§10). Images may be embedded the same way **or come from the web over `https:`** (`<img src>`, CSS `url()`); `http:`, `blob:`, `file:`, protocol-relative and root-relative URLs are refused. No `<link>`, `<base>` or `@import`; no font services or CDNs. Named font families are the device's to provide: any `font-family` stack is allowed, and a stack of named families with no generic family at the end is noted (`font.no_fallback`).
+4. **Static.** No forms, inputs, buttons, links, iframes, video or other interactive or embedding elements. All interaction is added by the engine at the slots (§6).
+5. **Bound by attribute.** The slots and the gift list in §6 are found by their `data-ms-*` attributes, on elements of the author's choice (only the image slots are `<img>`). How the page is built around them (which elements, in what order, how many `<style>` elements) is the author's.
 
-Breaking any rule **rejects** the upload with line and column. Nothing is silently stripped.
+Breaking any rule **rejects** the upload with line and column. Nothing is silently stripped. Notes (warnings: contrast, a font without a fallback, a title below the first screen) go to the giver's Sent-in card and never reject.
 
 ---
 
@@ -74,8 +70,8 @@ Breaking any rule **rejects** the upload with line and column. Nothing is silent
 ```
 
 - `<body>` carries only the metadata attributes in §4. No `class`, `style`, `id` or other attributes on it.
-- The **first child** of `<body>` may be one `<style>` element. It's the only `<style>` allowed, and it can't appear anywhere else.
-- Everything after it is the theme content. At publish, the engine moves the content into its own wrapper, `<div data-ms-theme>`, which is the **theme root**.
+- `<style>` elements may appear anywhere in the body, any number; their CSS is processed in document order, so a token declared later wins. A `<style>` carries no attribute but `type`.
+- The rest is the theme content. At publish, the engine moves the content into its own wrapper, `<div data-ms-theme>`, which is the **theme root**.
 
 What the backend adds at publish (never in the theme):
 
@@ -140,7 +136,7 @@ Token values must be literal (no `var()` chains, no `url()`).
 
 `--ms-ground` is optional and has no default. It picks what the engine draws behind **every** screen of her page: `plain` the `--ms-color-bg` colour, `paper` the house rice paper, `wrap` the house wrapping paper with blossoms. A theme that uses `paper` or `wrap` leaves its own root transparent so the ground shows through. Rice paper uses `wrap`.
 
-**Required contrast** (an upload is rejected if any check fails): `ink` and `muted` on `bg` and `surface` ≥ 4.5:1; `on-accent` on `accent` ≥ 4.5:1; `accent` on `bg` ≥ 3:1.
+**Contrast** is noted as `token.contrast` when it falls short, never refused: `ink` and `muted` on `bg` and `surface` ≥ 4.5:1; `on-accent` on `accent` ≥ 4.5:1; `accent` on `bg` ≥ 3:1.
 
 ---
 
@@ -152,27 +148,27 @@ A **slot** is an element marked with `data-ms-slot="<name>"`. The theme's conten
 
 | Rule | |
 |---|---|
-| R1 | The file is a single `<body>` (hard rule 1) with only §4 attributes; an optional `<style>` is its first child, and there is no other `<style>` |
-| R2 | Exactly one `<h1>`, which **is** the `title` slot |
-| R3 | Exactly one gift list `[data-ms-gift-list]`, after the `<h1>` in document order |
+| R1 | The file is a single `<body>` (hard rule 1) with only §4 attributes; `<style>` elements anywhere, any number |
+| R2 | Exactly one `title` slot, on any element that can hold text. The engine makes it the page's level-1 heading (`role="heading" aria-level="1"` when it is not an `h1`) |
+| R3 | Exactly one gift list `[data-ms-gift-list]`, anywhere |
 | R4 | The gift list's **direct children** include ≥ 1 `[data-ms-gift]`. The **first** one is the **gift template**; the others are samples, removed at publish |
 | R5 | No `[data-ms-gift]` outside the gift list; no gifts nested in gifts |
 | R6 | The gift template contains exactly one `gift-name` and one `gift-image` slot, and at most one `gift-note` slot |
 | R7 | Page slots (§6.2) appear at most once each, outside the gift list. Gift slots (§6.3) appear only inside a gift |
 | R8 | Every `data-ms-*` attribute and slot name is from this spec; unknown ones are errors |
-| R9 | Slot elements are of the allowed element types listed below |
+| R9 | The image slots (`cover`, `gift-image`) are `<img>`. Every other slot, the gift list and the gifts sit on any element that can hold content (not `img`, `br`, `hr`, `wbr`, `col`, `audio`, `svg`) |
 
 ### 6.2 Page slots
 
 | Slot | Required | Element | Filled with |
 |---|---|---|---|
-| `title` | ✔ | `h1` | Occasion title (text) |
-| `dedication` | ✔ | `p`, `span`, `div` | Localized line, e.g. "For Linh, from Vu" / "Gửi Linh, từ Vu" |
-| `message` | | `div`, `section`, `blockquote` | Giver's message: one `<p>` per line |
+| `title` | ✔ | any | Occasion title (text). The engine adds `role="heading" aria-level="1"` unless it is an `h1` |
+| `dedication` | ✔ | any | Localized line, e.g. "For Linh, from Vu" / "Gửi Linh, từ Vu" |
+| `message` | | any container | Giver's message: one `<p>` per line |
 | `cover` | | `img` | Giver's cover photo (`src`, `srcset`, `sizes`, `alt`, `width`, `height`) |
-| `recipient-name` | | `span`, `strong`, `em`, `p` | Her name (text) |
-| `giver-name` | | `span`, `strong`, `em`, `p` | Giver's display name (text) |
-| `occasion-date` | | `span`, `time`, `p` | Date in the page locale (`Nov 2, 2026` / `02/11/2026`) |
+| `recipient-name` | | any | Her name (text) |
+| `giver-name` | | any | Giver's display name (text) |
+| `occasion-date` | | any | Date in the page locale (`Nov 2, 2026` / `02/11/2026`); a `time` also gets `datetime` |
 
 ### 6.3 Gift list and gift slots
 
@@ -189,11 +185,11 @@ A **slot** is an element marked with `data-ms-slot="<name>"`. The theme's conten
 
 | Element | Allowed tags | At publish |
 |---|---|---|
-| `[data-ms-gift-list]` | `ul`, `ol`, `div`, `section` | Gets `role="radiogroup"` (pick limit 1) or `role="group"` |
-| `[data-ms-gift]` | `li`, `div`, `article` | Cloned once per gift. Becomes the control: `role="radio"`/`"checkbox"`, `tabindex`, `aria-checked`, `aria-labelledby` → its `gift-name`; keyboard handled by the engine runtime |
+| `[data-ms-gift-list]` | any container | Gets `role="radiogroup"` (pick limit 1) or `role="group"` |
+| `[data-ms-gift]` | any container | Cloned once per gift. Becomes the control: `role="radio"`/`"checkbox"`, `tabindex`, `aria-checked`, `aria-labelledby` → its `gift-name`; keyboard handled by the engine runtime |
 | `gift-image` | `img` | Gift photo (`src`, `srcset`, `sizes`, `alt`, `width`, `height`) |
-| `gift-name` | `h2`–`h4`, `p`, `span`, `strong` | Gift name (text) |
-| `gift-note` | `p`, `span`, `em` | Giver's note (text) |
+| `gift-name` | any | Gift name (text) |
+| `gift-note` | any | Giver's note (text) |
 
 ### 6.4 Optional content: `data-ms-if`
 
@@ -240,14 +236,15 @@ Themes style states with CSS only:
 
 Parsed with a real CSS parser and rewritten:
 
-- **Source:** the single `<style>` (first child of `<body>`) and `style=""` attributes.
+- **Source:** every `<style>` in the body, in document order, and `style=""` attributes.
 - **Scoping:** `body` selectors are rewritten to `[data-ms-theme]` (the theme root), so `body { background: … }` works both locally and when published. Every other selector is prefixed with `[data-ms-theme] `. Rules on `html`, `:root`, `head`, `*` at top level or `[data-ms-engine]` are rejected.
 - **Layering:** output goes into `@layer theme`. Engine UI is outside the theme root and unlayered, so it can't be targeted or overridden.
 - **Inline styles** are moved into the stylesheet as hashed classes, so the published page has no inline styles.
 - **Allowed:** selectors, `@media`, `@supports`, `@keyframes`, `@font-face` (embedded `src` only), custom properties, animations, transitions.
 - **Reserved names:** class, id and `@keyframes` names starting with `ms-` belong to the page engine and the MySpecial Paper kit. A theme using one is rejected (`css.reserved_name` in CSS, `html.reserved_name` in markup).
 - **Plain names:** a `@keyframes` name is a plain identifier, without escapes or quotes (`css.keyframes_name`). A selector cannot start with a combinator (`~ *`, `> p`).
-- **Rejected:** `@import`, `@namespace`, `@charset`; `url()` other than an embedded `data:` URI of an allowed type; `local()`; `expression()`, `behavior`, `-moz-binding`; `position: fixed`; `content:` longer than 40 characters.
+- **Fonts:** any `font-family` stack. Embedded families are checked (§10); a named family that is not embedded is the device's to provide, and a stack of those with no generic family at the end is noted (`font.no_fallback`).
+- **Rejected:** `@import`, `@namespace`, `@charset`; `url()` other than an embedded `data:` URI of an allowed type or an `https:` image (`http:` is `ref.insecure`); `local()`; `expression()`, `behavior`, `-moz-binding`; `position: fixed`; `content:` longer than 40 characters.
 - **Limits:** ≤ 200 KB of CSS excluding embedded data; ≤ 2 000 rules; nesting ≤ 10; ≤ 6 compound parts per selector.
 
 ---
@@ -308,6 +305,7 @@ Themes can't style these beyond tokens and can't cover them (enforced by the tes
 | Fonts | ≤ 6 faces |
 | DOM | ≤ 3 000 elements, depth ≤ 32 |
 
+- **Images from the web:** `<img src="https://…">` and CSS `url(https://…)` are kept as they are and loaded by her browser (her page's policy allows `img-src https:`). The image host then sees when, and from where, she opens the page. `http:` is refused (`ref.insecure`).
 - Embedded data must be base64 and match its declared type by magic bytes.
 - At upload, every embedded asset is **extracted**, sanitized, re-encoded and stored as a separate file on the user-content domain. The published page references those files and **never contains `data:` URIs**.
 - Sample content inside slots (e.g. sample gift photos) is used only for the validator's preview, never published.
@@ -317,13 +315,13 @@ Themes can't style these beyond tokens and can't cover them (enforced by the tes
 
 ## 11. Allowed HTML
 
-**Root:** `body` (metadata attributes only), with one optional `style` as its first child.
+**Root:** `body` (metadata attributes only); `style` elements anywhere.
 
-**Elements (theme content):** `div section header footer main article aside figure figcaption h1–h4 p span strong em small br hr blockquote time ul ol li img audio` (only `data-ms-music`) and inline `svg` with: `g path circle ellipse rect line polyline polygon text tspan defs linearGradient radialGradient stop clipPath mask use` (`use` → `#local` only).
+**Elements (theme content):** every inert HTML element: `div section header footer main article aside nav figure figcaption address hgroup h1–h6 p span strong em b i u s sub sup mark q cite abbr dfn code pre kbd samp var small br wbr hr blockquote time data ins del bdi bdo ruby rt rp ul ol li dl dt dd table caption colgroup col thead tbody tfoot tr th td img audio` (only `data-ms-music`) and inline `svg` with: `g path circle ellipse rect line polyline polygon text tspan defs linearGradient radialGradient stop clipPath mask use` (`use` → `#local` only).
 
-**Attributes:** `class id style title alt role aria-* lang dir width height loading decoding src` (embedded `data:` only) `data-ms-*` (spec names only), and SVG presentation attributes. `srcset`/`sizes` are not allowed in themes; the engine sets them on slot images.
+**Attributes:** `class id style title alt role aria-* lang dir width height loading decoding src` (embedded `data:`, or `https:` on `img`) `colspan rowspan scope headers span value datetime start reversed` `data-ms-*` (spec names only), and SVG presentation attributes. `srcset`/`sizes` are not allowed in themes; the engine sets them on slot images.
 
-**Rejected:** everything else, including `doctype html head title meta script noscript link base` a second or misplaced `style`, `iframe frame object embed form input button select textarea a details dialog template slot portal video canvas math foreignObject`, every `on*` attribute, `href`/`xlink:href` other than `#local` in SVG, and `srcdoc`.
+**Rejected:** everything else, including `doctype html head title meta script noscript link base`, a `style` with attributes other than `type`, `iframe frame object embed form input button select textarea a details dialog template slot portal video canvas picture source track map area math foreignObject`, every `on*` attribute, `href`/`xlink:href` other than `#local` in SVG, and `srcdoc`.
 
 ---
 
@@ -431,23 +429,24 @@ Each lives in the public templates repo at `official/<id>/theme.html` with its f
 |---|---|
 | `file.too_large` / `file.not_utf8` / `file.not_single_body` (doctype, `<html>`, `<head>` or content outside `<body>`) | §2.1 |
 | `js.script_element` / `js.event_attribute` / `js.javascript_url` | §2.2 |
-| `ref.external` / `ref.link_element` / `ref.font_not_embedded` / `ref.import` | §2.3 |
+| `ref.external` / `ref.insecure` (an `http:` image) / `ref.import` | §2.3 |
+| `font.no_fallback` (warning) | §2.3, §7 |
 | `html.element_not_allowed` / `html.attribute_not_allowed` | §11 |
 | `meta.missing` / `meta.unknown` / `meta.invalid` / `meta.version_not_increased` | §4 (`<body>` attributes) |
-| `struct.body_attribute` / `struct.style_position` / `struct.style_count` | R1 |
-| `struct.h1_count` / `struct.h1_not_title` | R2 |
-| `struct.gift_list_count` / `struct.gift_list_before_title` | R3 |
+| `struct.body_attribute` / `struct.style_attributes` | R1 |
+| `struct.required_slot_missing` (`title`) | R2 |
+| `struct.gift_list_count` | R3 |
 | `struct.no_gift_template` | R4 |
 | `struct.gift_outside_list` / `struct.gift_nested` | R5 |
 | `struct.gift_name_missing` / `struct.gift_image_missing` / `struct.gift_slot_duplicate` | R6 |
 | `struct.slot_duplicate` / `struct.slot_wrong_scope` | R7 |
 | `struct.unknown_slot` / `struct.unknown_data_attr` | R8 |
-| `struct.slot_wrong_element` | R9 |
+| `struct.slot_wrong_element` | R9 (an image slot not on `img`; a slot, gift or gift list on an element that cannot hold content) |
 | `struct.required_slot_missing` | §6.2 (`title`, `dedication`) |
 | `css.*` | §7 (`css.reserved_name`: an `ms-` class, id or `@keyframes` name) |
 | `html.reserved_name` | §7, §11 (an `ms-` class or id in the markup) |
 | `css.keyframes_name` | §7 (an escaped or quoted `@keyframes` name) |
 | `internal.unexpected` | The file could not be checked (never a crash: the upload is rejected and can be tried again) |
 | `asset.*` (type, size, dimensions, magic mismatch, glyph coverage, license) | §10 |
-| `token.contrast` | §5 |
+| `token.contrast` (warning) | §5 |
 | `text.untranslated` (warning) | §6.5 |
